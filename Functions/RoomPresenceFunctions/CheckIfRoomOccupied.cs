@@ -18,12 +18,11 @@ namespace RoomPresenceFunctions
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            RoomStatus status = allRoomStatus.CreateQuery<RoomStatus>().Where(r => r.PartitionKey == name).FirstOrDefault(); 
+            var status = allRoomStatus.CreateQuery<RoomStatus>()
+                .Where(s => s.PartitionKey == name)
+                .FirstOrDefault();
 
-            //var status = allRoomStatus.Where(r => r.PartitionKey == name).FirstOrDefault();
-            //var status = new RoomStatus { IsOccupied = true };
-
-            string returnStatus = "uknown";
+            string returnStatus = "unknown";
 
             if (status != null)
             {

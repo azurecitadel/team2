@@ -55,11 +55,16 @@ namespace RoomPresenceFunctions
                 }
             }
 
-
             // Expect the blob name format to be RoomName.jpg or similar
             var roomId = name.Split('.')[0];
 
-            return new RoomStatus { PartitionKey = roomId, RowKey = Guid.NewGuid().ToString(), IsOccupied = personPresent };
+
+            return new RoomStatus { PartitionKey = roomId, RowKey = GenerateLogTailRowKey(), IsOccupied = personPresent };
+        }
+
+        private static string GenerateLogTailRowKey()
+        {
+            return string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks);
         }
     }
 }

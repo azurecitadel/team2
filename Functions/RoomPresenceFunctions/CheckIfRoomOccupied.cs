@@ -18,19 +18,26 @@ namespace RoomPresenceFunctions
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var status = allRoomStatus.CreateQuery<RoomStatus>()
+            RoomStatus lastStatus = allRoomStatus.CreateQuery<RoomStatus>()
                 .Where(s => s.PartitionKey == name)
                 .FirstOrDefault();
 
-            string returnStatus = "unknown";
+            string statusString = "unknown";
 
-            if (status != null)
+            if (lastStatus != null)
             {
-                returnStatus = status.IsOccupied == true ? "occupied" : "unoccupied";
+                statusString = lastStatus.IsOccupied == true ? "occupied" : "unoccupied";
             }
 
+            string statusJson = Newtonsoft.Json.JsonConvert.SerializeObject(
+                new
+                {
+                    OccupiedStatus = statusString,
+                    TimeStamp = lastStatus.Timestamp
+                });
+
             // Fetching the name from the path parameter in the request URL
-            return req.CreateResponse(HttpStatusCode.OK, returnStatus);
+            return req.CreateResponse(HttpStatusCode.OK, statusJson);
         }
     }
 }

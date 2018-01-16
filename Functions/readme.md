@@ -1,4 +1,4 @@
-There are two functions
+There are two functions for determining room occupancy:
 
 __ProcessRoomImage__ monitors blob storage and will be triggered when a new image is uploaded. It uses the cognitive services computer vision API to get a list of tags. It checks to determine if "person" is a tag associated with the image with a confidence higher than a set threshold. If so, the room is considered to be occupied. If not, unoccupied.The result is written to table storage using the "Room ID". The Room ID is simply the blob name minues the file extension so, for example it might be useful to name images Room1.jpg, Room.jpg or Clyde.jpg, Everest.jpg etc
 

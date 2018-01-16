@@ -23,17 +23,19 @@ namespace RoomPresenceFunctions
                 .FirstOrDefault();
 
             string statusString = "unknown";
+            string timeStamp = "unavailable";
 
             if (lastStatus != null)
             {
                 statusString = lastStatus.IsOccupied == true ? "occupied" : "unoccupied";
+                timeStamp = lastStatus.Timestamp.UtcDateTime.ToString();
             }
 
             string statusJson = Newtonsoft.Json.JsonConvert.SerializeObject(
                 new
                 {
                     OccupiedStatus = statusString,
-                    TimeStamp = lastStatus.Timestamp
+                    TimeStamp = timeStamp
                 });
 
             // Fetching the name from the path parameter in the request URL

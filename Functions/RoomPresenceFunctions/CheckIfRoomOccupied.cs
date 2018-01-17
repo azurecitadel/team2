@@ -11,7 +11,7 @@ namespace RoomPresenceFunctions
     public static class CheckIfRoomOccupied
     {
         [FunctionName("CheckIfRoomOccupied")]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "HttpTriggerCSharp/name/{name}")]HttpRequestMessage req,
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "CheckRoomOccupationByName/{name}")]HttpRequestMessage req,
             string name,
             [Table("RoomOccupation")] CloudTable allRoomStatus,
             TraceWriter log)

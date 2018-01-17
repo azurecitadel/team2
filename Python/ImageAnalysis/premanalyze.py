@@ -1,4 +1,4 @@
-#
+# 
 # Hacked from https://docs.microsoft.com/en-us/azure/cognitive-services/Computer-vision/quickstarts/python 
 # Python 2.7
 #

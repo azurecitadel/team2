@@ -12,11 +12,11 @@ from azure.storage.blob import (
     ContentSettings,
 )
 
-dir = "/home/pi/Pictures/"
+dir = "/home/pi/Pictures"
 
-location    = "TVPB5"
-room        = "GreatOuse"
-frequency   = 5
+location    = "TVP-B5"
+room        = "Great_Ouse"
+frequency   = 1
 
 # Don't run at weekends
 
@@ -28,7 +28,7 @@ if datetime.date.today().isoweekday() > 5:
 
 now = datetime.datetime.now()
 start_of_day = now.replace(hour=9, minute=0, second=0, microsecond=0)
-end_of_day = now.replace(hour=18, minute=0, second=0, microsecond=0) 
+end_of_day = now.replace(hour=17, minute=0, second=0, microsecond=0) 
 
 if now < start_of_day or now > end_of_day:
     print "Outside of core hours. Exiting..."
@@ -43,12 +43,13 @@ if now.minute % frequency != 0:
 
 # Take picture and store in /home/pi/Pictures
 
-filename = location + "_" + room + "_" + now.strftime("%Y%m%d%H%M") + ".jpg"  
+timestamp = now.strftime("%Y%m%d%H%M")
+lfilename = dir + "/" + location + "_" + room + "_" + timestamp + ".jpg"  
 camera = PiCamera()
 camera.resolution = (1024, 768)
 camera.start_preview()
 sleep(2) # Camera warm-up time
-camera.capture(dir + filename)
+camera.capture(lfilename)
 
 # Upload to blob service
 
@@ -61,9 +62,9 @@ azureblob.create_container(location.lower())
 
 azureblob.create_blob_from_path(
     location.lower(), 
-    filename.lower(), 
-    dir + filename, 
+    room + "/" + timestamp + ".jpg", 
+    lfilename, 
     content_settings=ContentSettings(content_type='image/png')
     )
 
-print filename + " uploaded to blob storage." 
+print lfilename + " uploaded to blob storage." 

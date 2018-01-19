@@ -55,9 +55,9 @@ namespace RoomPresenceFunctions
                 }
             }
 
-            // Expect the blob name format to be RoomName.jpg or similar
-            var roomId = name.Split('.')[0];
-
+            // Expect the blob name format to be Location.RoomName.Date.Time.jpg or similar
+            var splitName = name.Split('.');
+            var roomId = $"{splitName[0]}.{splitName[1]}";
 
             return new RoomStatus { PartitionKey = roomId, RowKey = GenerateLogTailRowKey(), IsOccupied = personPresent };
         }

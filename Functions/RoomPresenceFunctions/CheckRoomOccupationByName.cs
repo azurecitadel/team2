@@ -8,10 +8,10 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace RoomPresenceFunctions
 {
-    public static class CheckIfRoomOccupied
+    public static class CheckRoomOccupationByName
     {
-        [FunctionName("CheckIfRoomOccupied")]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "HttpTriggerCSharp/name/{name}")]HttpRequestMessage req,
+        [FunctionName("CheckRoomOccupationByName")]
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "CheckRoomOccupationByName/{name}")]HttpRequestMessage req,
             string name,
             [Table("RoomOccupation")] CloudTable allRoomStatus,
             TraceWriter log)
@@ -34,6 +34,7 @@ namespace RoomPresenceFunctions
             string statusJson = Newtonsoft.Json.JsonConvert.SerializeObject(
                 new
                 {
+                    RoomName = name,
                     OccupiedStatus = statusString,
                     TimeStamp = timeStamp
                 });

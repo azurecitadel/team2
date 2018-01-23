@@ -14,9 +14,13 @@ from azure.storage.blob import (
 
 dir = "/home/pi/Pictures"
 
-location    = "TVP-B5"
+account_name    = 'team2iotfuncstorage'
+account_key     = 'BW8wHjQ6Uk0Xope9PayashhK3hr7wdpsBiJkkf5p6BgkPafQAjyJFH1ivitH9nMLH+XwCN346/xWB2Pp2nzi7Q=='
+
+
+location    = "TVP_B5"
 room        = "Great_Ouse"
-frequency   = 1
+frequency   = 5
 
 # Don't run at weekends
 
@@ -44,7 +48,8 @@ if now.minute % frequency != 0:
 # Take picture and store in /home/pi/Pictures
 
 timestamp = now.strftime("%Y%m%d%H%M")
-lfilename = dir + "/" + location + "_" + room + "_" + timestamp + ".jpg"  
+filename = location + "." + room + "." + timestamp + ".jpg"  
+lfilename = dir + '/' + filename
 camera = PiCamera()
 camera.resolution = (1024, 768)
 camera.start_preview()
@@ -54,17 +59,17 @@ camera.capture(lfilename)
 # Upload to blob service
 
 azureblob = BlockBlobService(
-    account_name    = 'iotchallengeteam2',
-    account_key     = 'XwhJCDvAOryXjrlo3wcWQojMCU0LAV+8QsaBxgLKVE0B0mr5iC4611jpxDLO/xU+0SIIbQxKofYx5RRRk1UneA==',
+    account_name    = account_name,
+    account_key     = account_key,
     )
 
-azureblob.create_container(location.lower())
+azureblob.create_container('images')
 
 azureblob.create_blob_from_path(
-    location.lower(), 
-    room + "/" + timestamp + ".jpg", 
+    'images', 
+    filename, 
     lfilename, 
     content_settings=ContentSettings(content_type='image/png')
     )
 
-print lfilename + " uploaded to blob storage." 
+print filename + " uploaded to container https://" + account_name + ".core.windows.net/images/." 

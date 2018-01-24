@@ -10,5 +10,6 @@ namespace RoomPresenceFunctions
     public class RoomStatus : TableEntity
     {
         public bool IsOccupied { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

@@ -59,7 +59,14 @@ namespace RoomPresenceFunctions
             var splitName = name.Split('.');
             var roomId = $"{splitName[0]}.{splitName[1]}";
 
-            return new RoomStatus { PartitionKey = roomId, RowKey = GenerateLogTailRowKey(), IsOccupied = personPresent };
+            //https://team2iotfuncstorage.blob.core.windows.net/samples-workitems/TVP_B1.Kelvin.20180117.1746.jpg
+
+            return new RoomStatus {
+                PartitionKey = roomId,
+                RowKey = GenerateLogTailRowKey(),
+                IsOccupied = personPresent,
+                ImageUrl = $"https://team2iotfuncstorage.blob.core.windows.net/samples-workitems/{name}"
+            };
         }
 
         private static string GenerateLogTailRowKey()

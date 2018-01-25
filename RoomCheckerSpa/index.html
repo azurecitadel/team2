@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1.0' />
+  <title>Room Status</title>
+
+  <!-- CSS  -->
+  <link href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet'>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css'>
+
+  <style>
+    .icon-block {
+      padding: 0 15px;
+    }
+
+    .icon-block .material-icons {
+      font-size: inherit;
+    }
+
+    .card {
+      display:none;
+    }
+  </style>
+
+</head>
+
+
+
+<body>
+  <nav class='light-blue lighten-1' role='navigation'>
+    <div class='nav-wrapper container'>
+      <!-- <a id='logo-container' href='#' class='brand-logo'>Logo</a> -->
+      <ul class='right hide-on-med-and-down'>
+        <li>
+          <!-- <a href='#'>Navbar Link</a> -->
+        </li>
+      </ul>
+
+      <ul id='nav-mobile' class='side-nav'>
+        <li>
+          <a href='#'>Navbar Link</a>
+        </li>
+      </ul>
+      <a href='#' data-activates='nav-mobile' class='button-collapse'>
+        <i class='material-icons'>menu</i>
+      </a>
+    </div>
+  </nav>
+  <div class='section no-pad-bot' id='index-banner'>
+    <div class='container'>
+      <br>
+      <br>
+      <h1 class='header center orange-text'>Room Status Checker</h1>
+      <div class='row'>
+        <div class='input-field col s8'>
+          <select id='room-select'>
+            <option value='TVP_B1.Kelvin'>Kelvin, Building 1</option>
+            <option value='TVP_B4.Everest_1'>Everest, Building 4</option>
+            <option value='TVP_B5.Great_Ouse'>Great Ouse, Building 5</option>
+            <option value='B5.Clyde'>Clyde, Building 5</option>
+          </select>
+          <label>Choose a room</label>
+        </div>
+        <div class='col s4'>
+          <a id='download-button' class='btn-large waves-effect waves-light orange'>Submit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class='container'>
+    <div class='section'>
+
+      <div class='row'>
+        <div class='col s12 m7'>
+          <div class='card'>
+            <div class='card-image'>
+              <img id='roomImageUrl' src='' />
+              <span id='card-title' class='card-title'>Room Name</span>
+            </div>
+            <div class='card-content'>
+              <div id='currentStatus'></div>
+              <div id='lastUpdate'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <br>
+    <br>
+  </div>
+
+  <!--  Scripts-->
+  <script src='https://code.jquery.com/jquery-2.1.1.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js'></script>
+
+  <script>
+    (function ($) {
+      $(function () {
+
+        $('.button-collapse').sideNav();
+
+      }); // end of document ready
+    })(jQuery); // end of jQuery name space
+
+    $(document).ready(function () {
+      $('select').material_select();
+      $('#download-button').click(() => {
+        var room = $('#room-select').val();
+        $('.card').hide();
+
+        $.ajax('https://team2iot.azurewebsites.net/api/CheckRoomOccupationByName/' + room +
+            '?code=jkWOir65H4dqrj7Zm5GBSrsoyArAsStWLSnKdzZ3G/WLIQF9zDiCRQ==')
+          .done(function (data) {
+            if (data.ImageUrl.toLowerCase() === 'unavailable') { 
+              data.ImageUrl = 'https://team2iotfuncstorage.blob.core.windows.net/spa/dogs.jpg';
+            }
+            $('#roomImageUrl').attr('src', data.ImageUrl);
+            $('#card-title').text(room);
+            $('#currentStatus').text((data.OccupiedStatus).toUpperCase());
+            $('#lastUpdate').text(data.TimeStamp);
+            $('.card').show();
+          });
+      });
+    });
+  </script>
+
+</body>
+
+</html>

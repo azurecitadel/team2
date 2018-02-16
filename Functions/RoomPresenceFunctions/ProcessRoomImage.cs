@@ -24,49 +24,51 @@ namespace RoomPresenceFunctions
 
             const string uriBase = "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/tag";
 
-            HttpClient client = new HttpClient();
-
-            // Request headers.
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
-
-            // Request parameters. A third optional parameter is "details".
-            //string requestParameters = "visualFeatures=Categories,Description,Color&language=en";
-
-            // Assemble the URI for the REST API Call.
-            string uri = uriBase; //+ "?" + requestParameters;
-
-            HttpResponseMessage response;
-            bool personPresent = false;
-
-            using (StreamContent content = new StreamContent(myBlob))
+            using (HttpClient client = new HttpClient())
             {
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                response = await client.PostAsync(uri, content);
+                // Request headers.
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                string responseString = await response.Content.ReadAsStringAsync();
+                // Request parameters. A third optional parameter is "details".
+                //string requestParameters = "visualFeatures=Categories,Description,Color&language=en";
 
-                JObject tags = JObject.Parse(responseString);
-                JToken personTag = tags.SelectToken("$.tags[?(@.name == 'person')]");
+                // Assemble the URI for the REST API Call.
+                string uri = uriBase; //+ "?" + requestParameters;
 
-                if (personTag != null)
+                HttpResponseMessage response;
+                bool personPresent = false;
+
+                using (StreamContent content = new StreamContent(myBlob))
                 {
-                    float personConfidence = (float)personTag["confidence"];
-                    personPresent = personConfidence > ConfidenceThreshold ? true : false;
+                    content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    response = await client.PostAsync(uri, content);
+
+                    string responseString = await response.Content.ReadAsStringAsync();
+
+                    JObject tags = JObject.Parse(responseString);
+                    JToken personTag = tags.SelectToken("$.tags[?(@.name == 'person')]");
+
+                    if (personTag != null)
+                    {
+                        float personConfidence = (float)personTag["confidence"];
+                        personPresent = personConfidence > ConfidenceThreshold ? true : false;
+                    }
                 }
+
+                // Expect the blob name format to be Location.RoomName.Date.Time.jpg or similar
+                var splitName = name.Split('.');
+                var roomId = $"{splitName[0]}.{splitName[1]}";
+
+                //https://team2iotfuncstorage.blob.core.windows.net/samples-workitems/TVP_B1.Kelvin.20180117.1746.jpg
+
+                return new RoomStatus
+                {
+                    PartitionKey = roomId,
+                    RowKey = GenerateLogTailRowKey(),
+                    IsOccupied = personPresent,
+                    ImageUrl = $"https://team2iotfuncstorage.blob.core.windows.net/samples-workitems/{name}"
+                };
             }
-
-            // Expect the blob name format to be Location.RoomName.Date.Time.jpg or similar
-            var splitName = name.Split('.');
-            var roomId = $"{splitName[0]}.{splitName[1]}";
-
-            //https://team2iotfuncstorage.blob.core.windows.net/samples-workitems/TVP_B1.Kelvin.20180117.1746.jpg
-
-            return new RoomStatus {
-                PartitionKey = roomId,
-                RowKey = GenerateLogTailRowKey(),
-                IsOccupied = personPresent,
-                ImageUrl = $"https://team2iotfuncstorage.blob.core.windows.net/samples-workitems/{name}"
-            };
         }
 
         private static string GenerateLogTailRowKey()
